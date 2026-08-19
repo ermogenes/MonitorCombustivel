@@ -4,22 +4,20 @@ const DRIVE_API_UPLOAD = 'https://www.googleapis.com/upload/drive/v3/files'
 const DRIVE_API_FILES = 'https://www.googleapis.com/drive/v3/files'
 const SCOPES = 'https://www.googleapis.com/auth/drive.file'
 
+const CLIENT_ID = '906222669026-kb0q3m54p2dciaotcak20krmmb7vn0d8.apps.googleusercontent.com'
 const DEFAULT_FOLDER_PATH = '/Financeiro/01_Ingestao/Telemetria'
 
 let accessToken: string | null = null
 let tokenClient: any = null
 let folderIdCache: Record<string, string> = {}
 
-function getSettings(): { clientId: string; driveFolder: string } {
+function getDriveFolder(): string {
   const raw = localStorage.getItem('app_settings')
   if (raw) {
     const parsed = JSON.parse(raw)
-    return {
-      clientId: parsed.googleClientId || '',
-      driveFolder: parsed.driveFolder || DEFAULT_FOLDER_PATH,
-    }
+    return parsed.driveFolder || DEFAULT_FOLDER_PATH
   }
-  return { clientId: '', driveFolder: DEFAULT_FOLDER_PATH }
+  return DEFAULT_FOLDER_PATH
 }
 
 function loadGIS(): Promise<void> {
@@ -92,14 +90,11 @@ export const googleDriveService = {
   },
 
   async initialize(): Promise<boolean> {
-    const { clientId } = getSettings()
-    if (!clientId) return false
-
     try {
       await loadGIS()
       return new Promise((resolve) => {
         tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
-          client_id: clientId,
+          client_id: CLIENT_ID,
           scope: SCOPES,
           callback: (response: any) => {
             if (response.error) {
@@ -128,14 +123,11 @@ export const googleDriveService = {
   },
 
   async login(): Promise<boolean> {
-    const { clientId } = getSettings()
-    if (!clientId) throw new Error('Configure o Google Client ID nas configurações')
-
     await loadGIS()
 
     return new Promise((resolve, reject) => {
       tokenClient = (window as any).google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
+        client_id: CLIENT_ID,
         scope: SCOPES,
         callback: (response: any) => {
           if (response.error) {
@@ -169,7 +161,7 @@ export const googleDriveService = {
   async uploadEvent(event: RefuelEvent): Promise<string> {
     if (!accessToken) throw new Error('Não autenticado no Google Drive')
 
-    const { driveFolder } = getSettings()
+    const driveFolder = getDriveFolder()
     const folderId = await getFolderId(driveFolder)
     const fileName = formatFileName(event)
     const jsonContent = JSON.stringify(event, null, 2)

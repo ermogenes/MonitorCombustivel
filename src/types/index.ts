@@ -41,7 +41,6 @@ export interface SyncQueueItem {
 }
 
 export interface Settings {
-  googleClientId: string
   odometerManual: number | null
   driveFolder: string
 }

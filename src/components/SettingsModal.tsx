@@ -2,7 +2,6 @@ import { useState, useRef } from 'react'
 import {
   X,
   FolderOpen,
-  Key,
   Terminal,
   Send,
   Trash2,
@@ -18,7 +17,7 @@ interface SettingsModalProps {
 function loadSettings(): Settings {
   const raw = localStorage.getItem('app_settings')
   if (raw) return JSON.parse(raw)
-  return { googleClientId: '', odometerManual: null, driveFolder: '' }
+  return { odometerManual: null, driveFolder: '' }
 }
 
 function saveSettings(s: Settings) {
@@ -71,26 +70,6 @@ export function SettingsModal({ onClose, onSendRaw }: SettingsModalProps) {
         </div>
 
         <div className="space-y-6 px-5 py-5">
-          {/* Google Client ID */}
-          <section>
-            <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-300">
-              <Key className="h-4 w-4 text-blue-400" />
-              Google OAuth Client ID
-            </div>
-            <input
-              type="text"
-              value={settings.googleClientId}
-              onChange={(e) =>
-                setSettings({ ...settings, googleClientId: e.target.value })
-              }
-              placeholder="xxxx.apps.googleusercontent.com"
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-orange-500 focus:outline-none"
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              Crie no Google Cloud Console &gt; APIs &gt; Credentials &gt; OAuth 2.0
-            </p>
-          </section>
-
           {/* Drive Folder */}
           <section>
             <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-300">
